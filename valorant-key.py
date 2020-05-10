@@ -4,7 +4,7 @@ from selenium import webdriver
 time_out_delay = 5
 
 # every x minutes, we will check if the stream is still live
-live_time_checker = 10 * 60
+live_time_checker = 1 * 60
 
 # initialise the selenium webdriver
 driver = webdriver.Chrome()
@@ -32,7 +32,15 @@ def is_stream_live():
     video_player = get_element("/html/body/div[1]/div/div[2]/div[2]/main/div[2]/div[3]/div/div/div[2]/div/div[2]/div/div/div/div[5]")
     print("video player element successfully found")
 
-    return video_player.get_attribute("class") == "tw-c-text-overlay"
+    return video_player.get_attribute("class") == "tw-c-text-overlay" or 
+        get_element("/html/body/div[1]/div/div[2]/div[2]/main/div[2]/div[3]/div/div/div[2]/div/div[2]/div/div/div/div[4]").get_attribute("class") == "tw-c-text-overlay"
+
+
+def get_current_time():
+    t = time.localtime()
+    current_time = time.strftime("%H:%M:%S", t)
+    print(current_time)
+
 
 def main():
     load_twitch()
@@ -41,12 +49,13 @@ def main():
     while True:
         if not is_stream_live():
             print("stream is no longer live")
-            print(video_player.get_attribute("class"))
+            get_current_time()
             print("loading new stream...")
             load_twitch()
             load_stream()
         else:
             print("stream is still live")
+            get_current_time()
             time.sleep(live_time_checker)
 
 
