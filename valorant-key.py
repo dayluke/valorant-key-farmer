@@ -1,5 +1,6 @@
 import time
 from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
 
 time_out_delay = 5
 
@@ -16,7 +17,7 @@ def load_twitch():
 
 
 def get_element(xpath):
-     # wait for the previous command to be executed (e.g. page load)
+    # wait for the previous command to be executed (e.g. page load)
     time.sleep(time_out_delay)
     return driver.find_element_by_xpath(xpath)
 
@@ -29,11 +30,14 @@ def load_stream():
 
 
 def is_stream_live():
-    video_player = get_element("/html/body/div[1]/div/div[2]/div[2]/main/div[2]/div[3]/div/div/div[2]/div/div[2]/div/div/div/div[5]")
-    print("video player element successfully found")
+    try:
+        video_player = get_element("/html/body/div[1]/div/div[2]/div[2]/main/div[2]/div[3]/div/div/div[2]/div/div[2]/div/div/div/div[5]")
+        print("video player element successfully found")
 
-    return video_player.get_attribute("class") == "tw-c-text-overlay" or 
-        get_element("/html/body/div[1]/div/div[2]/div[2]/main/div[2]/div[3]/div/div/div[2]/div/div[2]/div/div/div/div[4]").get_attribute("class") == "tw-c-text-overlay"
+        return video_player.get_attribute("class") == "tw-c-text-overlay" or get_element(
+            "/html/body/div[1]/div/div[2]/div[2]/main/div[2]/div[3]/div/div/div[2]/div/div[2]/div/div/div/div[4]").get_attribute("class") == "tw-c-text-overlay"
+    except NoSuchElementException:
+        return False
 
 
 def get_current_time():
@@ -43,6 +47,7 @@ def get_current_time():
 
 
 def main():
+    
     load_twitch()
     load_stream()
     
