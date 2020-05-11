@@ -16,28 +16,33 @@ def load_twitch():
     print("twitch loaded correctly")
 
 
-def get_element(xpath):
+def get_element(classname):
     # wait for the previous command to be executed (e.g. page load)
     time.sleep(time_out_delay)
-    return driver.find_element_by_xpath(xpath)
+    try:
+        # finds all elements that contain the given classname
+        elem = driver.find_element_by_class_name(classname)
+        return elem
+    except NoSuchElementException:
+        print("cannot find element with class name", classname)
+        return None
+
 
 
 def load_stream():
-    first_twitch_stream = get_element("/html/body/div[1]/div/div[2]/div[2]/main/div[1]/div[3]/div/div/div/div[4]/div/div[1]/div[2]/div/div/div/div/article/div[1]/div/div/div[1]/div/a")
+    first_twitch_stream = get_element("tw-c-text-alt")
     print("twitch stream successfully found")
     first_twitch_stream.click()
     print("twitch stream successfully loaded")
 
 
 def is_stream_live():
-    try:
-        video_player = get_element("/html/body/div[1]/div/div[2]/div[2]/main/div[2]/div[3]/div/div/div[2]/div/div[2]/div/div/div/div[5]")
-        print("video player element successfully found")
-
-        return video_player.get_attribute("class") == "tw-c-text-overlay" or get_element(
-            "/html/body/div[1]/div/div[2]/div[2]/main/div[2]/div[3]/div/div/div[2]/div/div[2]/div/div/div/div[4]").get_attribute("class") == "tw-c-text-overlay"
-    except NoSuchElementException:
+    video_player = get_element("extensions-video-overlay-size-container")
+    if video_player == None:
         return False
+    else:
+        print("video player element successfully found")
+        return True
 
 
 def get_current_time():
